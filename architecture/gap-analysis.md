@@ -21,7 +21,7 @@ Le codebase Serac existant est **solide sur le plan crypto** (XChaCha20-Poly1305
 |--------|------------------|----------------|------|
 | Inscription | Email + passphrase → Argon2id → Master Key + sealed identity | Keypair ed25519 générée par l'agent, pas de passphrase | **NOUVEAU** : POST /v1/vaults/create avec public_key |
 | Login | Passphrase → auth_key → bcrypt | Signature ed25519 d'un challenge → token court-vie | **NOUVEAU** : POST /v1/auth/challenge + POST /v1/auth/token |
-| Session | JWT access 15min + refresh 30 jours | Token court-vie (1h), renouvellement automatique par l'agent | **ADAPTATION** : nouvelle table `agent_sessions` ou extension `sessions` |
+| Session | JWT access 15min + refresh 30 jours | JWT 1h + challenge Ed25519 pour renouvellement | **ADAPTATION** : JWT+Redis (stateless), PAS de table agent_sessions — voir ADR-002/005 |
 | 2FA | TOTP (humain) | Non applicable pour les agents | **EXCLUSION** : les agents n'ont pas de 2FA |
 | Recovery | BIP39 24 mots | Guardian/recovery défini par l'agent propriétaire | **NOUVEAU** : modèle recovery différent |
 
@@ -119,16 +119,9 @@ CREATE TABLE agent_vaults (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Sessions agent (challenge-response, pas JWT passphrase)
-CREATE TABLE agent_sessions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    vault_id UUID NOT NULL REFERENCES agent_vaults(id) ON DELETE CASCADE,
-    challenge BYTEA NOT NULL,                      -- nonce envoyé à l'agent
-    signed_challenge BYTEA,                        -- signature ed25519 de l'agent
-    token_hash TEXT NOT NULL,                       -- hash du token de session
-    expires_at TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+-- NOTE : Sessions agent → JWT+Redis (ADR-002/005). Pas de table agent_sessions.
+-- Challenges Ed25519 : Redis avec TTL 5 min (single-use).
+-- JWT : HMAC-SHA256, vérifié sans accès DB.
 ```
 
 ### 3.2 Modifications de tables existantes

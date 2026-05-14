@@ -110,8 +110,8 @@ Résolution ultérieure (authentification) :
 │  10. Vérifier plan valide                                       │
 │  11. INSERT agent_vaults (public_key, encrypted_master_key,    │
 │       master_key_nonce, key_commitment, key_algorithm, plan)   │
-│  12. INSERT agent_sessions (challenge, token_hash, expires_at)  │
-│  13. Retourner { vault_id, access_token, expires_in: 3600 }     │
+│  12. Signer JWT HMAC-SHA256 {sub, type, exp}                  │
+│  13. Retourner { vault_id, access_token (JWT), expires_in: 3600 }│
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -600,19 +600,10 @@ CREATE TABLE agent_vaults (
 CREATE INDEX idx_agent_vaults_public_key ON agent_vaults (public_key);
 CREATE INDEX idx_agent_vaults_owner ON agent_vaults (owner_id) WHERE owner_id IS NOT NULL;
 
--- Sessions agent (challenge-response)
-CREATE TABLE agent_sessions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    vault_id UUID NOT NULL REFERENCES agent_vaults(id) ON DELETE CASCADE,
-    challenge BYTEA NOT NULL,                              -- nonce envoyé à l'agent (32 bytes)
-    challenge_expires_at TIMESTAMPTZ NOT NULL,             -- TTL 5 min
-    token_hash TEXT NOT NULL,                               -- hash du token de session (bcrypt)
-    expires_at TIMESTAMPTZ NOT NULL,                       -- TTL 1 heure
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE INDEX idx_agent_sessions_vault ON agent_sessions (vault_id);
-CREATE INDEX idx_agent_sessions_expires ON agent_sessions (expires_at);
+-- NOTE : Les sessions agent utilisent JWT+Redis (ADR-002/ADR-005), PAS une table PostgreSQL.
+-- Les challenges Ed25519 sont stockés dans Redis avec TTL 5 min (single-use).
+-- Les JWT sont signés HMAC-SHA256, vérifiés sans accès DB.
+-- La table agent_sessions du draft initial est supprimée — voir ADR-002 section Auth.
 
 -- Guardians du vault (propriétaires humains)
 CREATE TABLE vault_guardians (
