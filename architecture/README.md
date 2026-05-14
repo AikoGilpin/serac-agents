@@ -11,12 +11,12 @@
 | `encryption-protocol.md` | ✅ Finalisé (ADR-001) | Protocole de chiffrement agent (Ed25519 + MK random, challenge-response, guardian, interop) |
 | `mcp-server-spec.md` | ✅ Draft (ADR-002) | Spécification MCP server (5 tools V1, auth hybride, tiering, discovery, BDD) |
 | `pricing-model.md` | ✅ Draft (ADR-003) | Modèle de pricing (coûts OVH, tiering auto, marges, scénarios financiers) |
+| `sdk-spec.md` | ✅ Draft (ADR-004) | Spécification SDK TS + Python (2 modes, auth, opérations V1/V2, plan de build S1-S5) |
 
 ## À créer
 
 | Fichier | Priorité | Description |
 |---------|----------|-------------|
-| `sdk-spec.md` | Phase 3e | Spécification SDK TypeScript + Python |
 | `discovery-spec.md` | Phase 2 | Détail des 4 couches de discovery (.well-known, WebMCP) |
 
 ## Conventions

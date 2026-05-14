@@ -31,6 +31,9 @@
 | — | Tiering automatique OVH (chaud/tiède/froid/Glacier) | Validé Kira+CC |
 | — | Discovery : 4 couches (.well-known/mcp.json, serac.json, MCP server, WebMCP) | Validé Kira+CC |
 | — | SDK : TS + Python en parallèle dès Phase 1 | Validé Kira+CC |
+| — | SDK modes : MCP (at-rest) + E2EE (client-side), même API | ADR-004 |
+| — | SDK interop : vecteurs de test JS↔Python partagés | ADR-004 |
+| — | SDK build : 5 semaines (S1-S3 TS, S4-S5 Python) | ADR-004 |
 | — | Attestation Ed25519 : V2 (pas MVP core) | Validé Kira+CC |
 | — | Search sémantique : V2 haute priorité | Validé Kira+CC |
 | — | x402 USDC : V2 (Phase 4) | Validé Kira+CC |
@@ -45,4 +48,4 @@
 - Pricing Enterprise : aligner sur €29.99/2TB (acquisition) vs marges plus élevées sur tiers inférieurs
 - OVH/Seald threat : si OVH lance S3 E2E consumer, le moat "E2E + OVH" s'effondre. Le vrai différenciant devient "agent-native + MCP"
 - Semantic search V2 : client-side indexing vs server-side with encrypted embeddings (profil performance détaillé à faire)
-- SDK Python timeline : parallèle vs séquentiel (TS d'abord, Python ensuite)
+- ~~SDK Python timeline : parallèle vs séquentiel (TS d'abord, Python ensuite)~~ → **Résolu ADR-004** : TypeScript S1-S3, Python S4-S5 (parallèle mais décalé)
