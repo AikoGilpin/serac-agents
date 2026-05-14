@@ -1,10 +1,26 @@
-# Architecture — Analyse codebase Serac et specs techniques
+# Architecture — Specs techniques Serac Agents
 
-*Dossier créé le 3 mai 2026. Sera rempli après accès VPS.*
+*Dossier créé le 3 mai 2026, mis à jour le 14 mai 2026.*
 
-## Contenu attendu
-- `existing-stack.md` — Cartographie de l'existant (routes, modèles, DB, services)
-- `gap-analysis.md` — Écarts entre l'existant et le pivot agent
-- `mcp-server-spec.md` — Spécification du MCP server Serac
-- `sdk-spec.md` — Spécification du SDK client
-- `encryption-protocol.md` — Protocole de chiffrement (V1 simple key vs envelope)
+## Documents
+
+| Fichier | Statut | Description |
+|---------|--------|-------------|
+| `existing-stack.md` | ✅ Finalisé | Cartographie VPS (routes, modèles, DB, services, crypto) |
+| `gap-analysis.md` | ✅ Finalisé | Écarts entre l'existant et le pivot agent (décisions D1→D10) |
+| `encryption-protocol.md` | ✅ Finalisé (ADR-001) | Protocole de chiffrement agent (Ed25519 + MK random, challenge-response, guardian, interop) |
+| `mcp-server-spec.md` | ✅ Draft (ADR-002) | Spécification MCP server (5 tools V1, auth hybride, tiering, discovery, BDD) |
+| `pricing-model.md` | ✅ Draft (ADR-003) | Modèle de pricing (coûts OVH, tiering auto, marges, scénarios financiers) |
+
+## À créer
+
+| Fichier | Priorité | Description |
+|---------|----------|-------------|
+| `sdk-spec.md` | Phase 3e | Spécification SDK TypeScript + Python |
+| `discovery-spec.md` | Phase 2 | Détail des 4 couches de discovery (.well-known, WebMCP) |
+
+## Conventions
+
+- **ADR** = Architecture Decision Record (numéroté ADR-001, ADR-002, etc.)
+- Les ADRs vivent dans `decisions/` une fois finalisés
+- Les drafts vivent dans `architecture/` pendant l'itération
