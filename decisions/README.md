@@ -9,7 +9,26 @@
 - **Décision** : Ce qu'on retient
 - **Conséquences** : Impact positif et négatif
 
-## Décisions validées (fusion Kira+CC, mai 2026)
+---
+
+## ADR formels
+
+Chaque ADR a un document dédié dans ce dossier :
+
+| Fichier | Décision | Statut |
+|---------|----------|--------|
+| `001-encryption-protocol.md` | Protocole chiffrement agent (Simple Key, Ed25519 + MK random) | ✅ Accepté |
+| `002-mcp-server.md` | Spécification MCP Server (HTTP Streamable + REST, 5 tools V1) | ✅ Accepté |
+| `003-pricing-model.md` | Modèle de pricing (4 tiers, tiering auto OVH, Stripe V1) | ✅ Accepté |
+| `004-sdk-spec.md` | SDK Client TS + Python (2 modes MCP/E2EE, interop, build S1-S5) | ✅ Accepté |
+| `005-hybrid-auth.md` | Authentification hybride (API key + Ed25519 challenge-response) | ✅ Accepté |
+| `006-guardian-recovery.md` | Guardian/Recovery (owner escrow V1, multi-guardian V2) | ✅ Accepté |
+| `007-automatic-tiering.md` | Tiering automatique OVH (chaud/tiède/froid/Glacier opt-in) | ✅ Accepté |
+| `008-discovery-layers.md` | Discovery 4 couches (well-known, serac.json, MCP Remote, WebMCP) | ✅ Accepté |
+| `009-remove-modules.md` | Suppression modules V1 (Email, Visio, Docs ; garder Messagerie) | ✅ Accepté |
+| `010-payment-strategy.md` | Paiement agents (Stripe V1, Circle USDC V2) | ✅ Accepté |
+
+## Détails validés (fusion Kira+CC, mai 2026)
 
 | ADR | Décision | Date |
 |-----|----------|------|
