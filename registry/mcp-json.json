@@ -1,0 +1,101 @@
+{
+  "$schema": "https://raw.githubusercontent.com/modelcontextprotocol/registry/main/schema/mcp-server.json",
+  "name": "serac",
+  "version": "0.1.0",
+  "description": "Serac — Sovereign E2E cloud storage for AI agents. MCP-native, zero-knowledge, RGPD-compliant, built in France.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AikoGilpin/serac-agents"
+  },
+  "homepage": "https://serac.cloud",
+  "author": {
+    "name": "Serac",
+    "email": "info@serac.cloud"
+  },
+  "license": "MIT",
+  "transport": {
+    "type": "streamable-http",
+    "url": "https://serac.cloud/api/agent/mcp/v1",
+    "headers": {
+      "Authorization": "Bearer ${SERAC_API_KEY}"
+    }
+  },
+  "tools": [
+    {
+      "name": "serac_store",
+      "description": "Store an encrypted object in a namespace. Data is E2E encrypted client-side before upload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string", "description": "Namespace to store in (e.g. 'memory', 'context')" },
+          "key": { "type": "string", "description": "Object key within the namespace" },
+          "data": { "type": "string", "description": "Base64-encoded encrypted data" },
+          "content_type": { "type": "string", "description": "MIME type (default: application/octet-stream)" }
+        },
+        "required": ["namespace", "key", "data"]
+      }
+    },
+    {
+      "name": "serac_retrieve",
+      "description": "Retrieve a presigned download URL for an encrypted object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string" },
+          "key": { "type": "string" }
+        },
+        "required": ["namespace", "key"]
+      }
+    },
+    {
+      "name": "serac_list",
+      "description": "List keys in a namespace with optional prefix filter.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string" },
+          "prefix": { "type": "string", "description": "Optional key prefix filter" },
+          "limit": { "type": "integer", "description": "Max keys to return (default 100)" },
+          "cursor": { "type": "string", "description": "Pagination cursor" }
+        },
+        "required": ["namespace"]
+      }
+    },
+    {
+      "name": "serac_delete",
+      "description": "Soft-delete an object from a namespace.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string" },
+          "key": { "type": "string" }
+        },
+        "required": ["namespace", "key"]
+      }
+    },
+    {
+      "name": "serac_quota",
+      "description": "Check storage quota and usage for the authenticated vault.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ],
+  "discovery": {
+    "mcp_json": "https://serac.cloud/api/agent/.well-known/mcp.json",
+    "serac_json": "https://serac.cloud/api/agent/.well-known/serac.json",
+    "llms_txt": "https://serac.cloud/api/agent/llms.txt"
+  },
+  "pricing": {
+    "tiers": [
+      { "name": "agent_free", "storage_bytes": 5368709120, "price_eur": 0 },
+      { "name": "agent_starter", "storage_bytes": 107374182400, "price_eur": 3.99 },
+      { "name": "agent_pro", "storage_bytes": 536870912000, "price_eur": 9.99 },
+      { "name": "agent_fleet", "storage_bytes": 2199023255552, "price_eur": 29.99 }
+    ],
+    "currency": "EUR",
+    "billing_period": "monthly"
+  },
+  "tags": ["storage", "encrypted", "e2ee", "mcp", "agent", "ai", "sovereign", "france", "rgpd", "zero-knowledge"]
+}

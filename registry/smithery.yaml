@@ -1,0 +1,84 @@
+# Smithery configuration for Serac MCP server
+# https://smithery.ai/docs/config
+
+name: serac
+description: "Serac — Sovereign E2E cloud storage for AI agents. MCP-native, zero-knowledge, RGPD-compliant."
+version: 0.1.0
+author: Serac
+homepage: https://serac.cloud
+repository: https://github.com/AikoGilpin/serac-agents
+license: MIT
+
+transport:
+  type: streamable-http
+  url: https://serac.cloud/api/agent/mcp/v1
+  headers:
+    Authorization: "Bearer ${SERAC_API_KEY}"
+
+tools:
+  - name: serac_store
+    description: "Store an encrypted object in a namespace. Data is E2E encrypted client-side before upload."
+    parameters:
+      namespace:
+        type: string
+        description: "Namespace to store in (e.g. 'memory', 'context')"
+        required: true
+      key:
+        type: string
+        description: "Object key within the namespace"
+        required: true
+      data:
+        type: string
+        description: "Base64-encoded encrypted data"
+        required: true
+      content_type:
+        type: string
+        description: "MIME type (default: application/octet-stream)"
+
+  - name: serac_retrieve
+    description: "Retrieve a presigned download URL for an encrypted object."
+    parameters:
+      namespace:
+        type: string
+        required: true
+      key:
+        type: string
+        required: true
+
+  - name: serac_list
+    description: "List keys in a namespace with optional prefix filter."
+    parameters:
+      namespace:
+        type: string
+        required: true
+      prefix:
+        type: string
+        description: "Optional key prefix filter"
+      limit:
+        type: integer
+        description: "Max keys to return (default 100)"
+      cursor:
+        type: string
+        description: "Pagination cursor"
+
+  - name: serac_delete
+    description: "Soft-delete an object from a namespace."
+    parameters:
+      namespace:
+        type: string
+        required: true
+      key:
+        type: string
+        required: true
+
+  - name: serac_quota
+    description: "Check storage quota and usage for the authenticated vault."
+
+tags:
+  - storage
+  - encrypted
+  - e2ee
+  - agent
+  - ai
+  - sovereign
+  - france

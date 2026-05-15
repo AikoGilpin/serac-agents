@@ -1,0 +1,97 @@
+{
+  "name": "serac",
+  "display_name": "Serac Cloud Storage",
+  "description": "Sovereign E2E cloud storage for AI agents. MCP-native, zero-knowledge, RGPD-compliant, built in France.",
+  "version": "0.1.0",
+  "homepage": "https://serac.cloud",
+  "repository": "https://github.com/AikoGilpin/serac-agents",
+  "author": {
+    "name": "Serac",
+    "email": "info@serac.cloud"
+  },
+  "license": "MIT",
+  "transport": {
+    "type": "streamable-http",
+    "url": "https://serac.cloud/api/agent/mcp/v1",
+    "auth": {
+      "type": "bearer",
+      "env_var": "SERAC_API_KEY"
+    }
+  },
+  "capabilities": {
+    "tools": true,
+    "streaming": true
+  },
+  "tools": [
+    {
+      "name": "serac_store",
+      "description": "Store an encrypted object in a namespace",
+      "input": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string" },
+          "key": { "type": "string" },
+          "data": { "type": "string" },
+          "content_type": { "type": "string" }
+        },
+        "required": ["namespace", "key", "data"]
+      }
+    },
+    {
+      "name": "serac_retrieve",
+      "description": "Retrieve a presigned download URL for an encrypted object",
+      "input": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string" },
+          "key": { "type": "string" }
+        },
+        "required": ["namespace", "key"]
+      }
+    },
+    {
+      "name": "serac_list",
+      "description": "List keys in a namespace",
+      "input": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string" },
+          "prefix": { "type": "string" },
+          "limit": { "type": "integer" },
+          "cursor": { "type": "string" }
+        },
+        "required": ["namespace"]
+      }
+    },
+    {
+      "name": "serac_delete",
+      "description": "Soft-delete an object from a namespace",
+      "input": {
+        "type": "object",
+        "properties": {
+          "namespace": { "type": "string" },
+          "key": { "type": "string" }
+        },
+        "required": ["namespace", "key"]
+      }
+    },
+    {
+      "name": "serac_quota",
+      "description": "Check storage quota and usage",
+      "input": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ],
+  "pricing": {
+    "model": "subscription",
+    "tiers": [
+      { "name": "Agent Free", "storage": "5 GB", "price": "€0" },
+      { "name": "Agent Starter", "storage": "100 GB", "price": "€3.99/mo" },
+      { "name": "Agent Pro", "storage": "500 GB", "price": "€9.99/mo" },
+      { "name": "Agent Fleet", "storage": "2 TB", "price": "€29.99/mo" }
+    ]
+  },
+  "tags": ["storage", "encrypted", "e2ee", "mcp", "agent", "ai", "sovereign", "france", "rgpd", "zero-knowledge"]
+}

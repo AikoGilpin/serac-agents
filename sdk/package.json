@@ -1,0 +1,57 @@
+{
+  "name": "serac-agent-sdk",
+  "version": "0.1.0",
+  "description": "Sovereign E2EE cloud storage SDK for AI agents — MCP-native, RGPD-compliant, built in France",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --clean && tsc --emitDeclarationOnly --outDir dist && cd dist && for f in *.d.ts; do cp \"$f\" \"${f%.ts}.mts\"; done",
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "serac",
+    "cloud",
+    "storage",
+    "e2ee",
+    "encrypted",
+    "mcp",
+    "agent",
+    "ai",
+    "sovereign",
+    "france",
+    "rgpd"
+  ],
+  "author": "Serac <info@serac.cloud>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AikoGilpin/serac-agents"
+  },
+  "homepage": "https://serac.cloud",
+  "bugs": {
+    "url": "https://github.com/AikoGilpin/serac-agents/issues"
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.8.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.0.0"
+  }
+}
