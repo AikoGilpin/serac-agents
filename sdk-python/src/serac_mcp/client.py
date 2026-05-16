@@ -111,6 +111,25 @@ class HttpClient:
                 except Exception:
                     error_json = {}
 
+                # Auto-auth: if 401 and using API key (no JWT), exchange for JWT and retry once
+                if e.code == 401 and not self.jwt and self.api_key:
+                    try:
+                        auth = self.refresh_auth()
+                        self.jwt = auth.get("accessToken")
+                        self.jwt_expiry = time.time() + auth.get("expiresIn", 3600) - 30
+                        # Retry the original request with JWT
+                        headers_retry = {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            **self._get_auth_headers(),
+                        }
+                        req_retry = urllib.request.Request(url, data=data, headers=headers_retry, method=method)
+                        ctx = urllib.request.ssl.create_default_context()
+                        with urllib.request.urlopen(req_retry, timeout=self.timeout, context=ctx) as resp_retry:
+                            return json.loads(resp_retry.read().decode("utf-8"))
+                    except Exception:
+                        pass  # Fall through to original error
+
                 if e.code in self.RETRY_STATUS_CODES and attempt < self.max_retries - 1:
                     delay = self.RETRY_DELAY * (2 ** attempt)
                     time.sleep(delay)
@@ -152,4 +171,4 @@ class HttpClient:
         Re-authenticate using the API key to get a fresh JWT.
         The server exchanges the API key for a JWT with 1-hour expiry.
         """
-        return self.post("/auth/api-key", {"api_key": self.api_key})
+        return self.post("/api-key", {"apiKey": self.api_key})

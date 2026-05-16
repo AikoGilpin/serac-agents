@@ -486,19 +486,6 @@ export async function mcpServerRoutes(app: FastifyInstance) {
       rateLimit: { max: 60, timeWindow: "1 minute" },
     },
   }, async (request, reply) => {
-    // ── Authenticate ──
-    const auth = await authenticateMcpRequest(request);
-    if (!auth) {
-      return reply.status(401).send({
-        jsonrpc: "2.0",
-        id: null,
-        error: MCP_ERRORS.UNAUTHORIZED,
-      });
-    }
-
-    const { vaultId } = auth;
-    const ip = request.ip;
-
     // ── Parse JSON-RPC ──
     let rpcRequest: JsonRpcRequest;
     try {
@@ -513,6 +500,29 @@ export async function mcpServerRoutes(app: FastifyInstance) {
     }
 
     const requestId = rpcRequest.id ?? null;
+
+    // ── Discovery methods: no auth required ──
+    // initialize and tools/list are public so registries (Glama, Smithery, etc.)
+    // can discover the server without credentials.
+    // tools/call, ping, and everything else require a valid agent JWT.
+    const DISCOVERY_METHODS = new Set(["initialize", "tools/list"]);
+    const isDiscovery = DISCOVERY_METHODS.has(rpcRequest.method);
+
+    // ── Authenticate (skip for discovery) ──
+    let vaultId = "";
+    if (!isDiscovery) {
+      const auth = await authenticateMcpRequest(request);
+      if (!auth) {
+        return reply.status(401).send({
+          jsonrpc: "2.0",
+          id: requestId,
+          error: MCP_ERRORS.UNAUTHORIZED,
+        });
+      }
+      vaultId = auth.vaultId;
+    }
+
+    const ip = request.ip;
 
     // ── Route method ──
     try {
@@ -639,14 +649,25 @@ export async function mcpServerRoutes(app: FastifyInstance) {
   });
 
   /**
-   * GET /mcp/v1 — SSE stream placeholder
+   * GET /mcp/v1 — Server discovery endpoint
    *
-   * For future MCP notifications support (server → client push).
-   * V1: not implemented, returns 501.
+   * Returns server capabilities for registries (Glama, Smithery, etc.)
+   * and clients that probe via GET before establishing a session.
+   * No authentication required — this is public discovery metadata.
    */
   app.get("/mcp/v1", async (_request, reply) => {
-    return reply.status(501).send({
-      error: "SSE transport not yet implemented. Use POST for JSON-RPC.",
+    return reply.send({
+      protocolVersion: "2025-03-26",
+      capabilities: {
+        tools: { listChanged: false },
+      },
+      serverInfo: {
+        name: "serac-storage",
+        version: "1.0.0",
+        description: "E2E encrypted cloud storage for autonomous AI agents — sovereign French infrastructure",
+      },
+      transports: ["post"],
+      endpoint: "/mcp/v1",
     });
   });
 }

@@ -143,12 +143,12 @@ class SeracAgent:
         result = client.post("/register", body)
 
         agent = cls(
-            api_key=result["api_key"],
+            api_key=result["apiKey"],
             base_url=base_url,
             timeout=timeout,
             max_retries=max_retries,
         )
-        agent._vault_id = result.get("vault_id")
+        agent._vault_id = result.get("vaultId")
         agent._client.jwt = result.get("accessToken")
         agent._client.jwt_expiry = (
             time.time() + result.get("expiresIn", 3600) - 30
@@ -156,8 +156,8 @@ class SeracAgent:
 
         return {
             "agent": agent,
-            "api_key": result["api_key"],
-            "vault_id": result.get("vault_id", ""),
+            "api_key": result["apiKey"],
+            "vault_id": result.get("vaultId", ""),
         }
 
     # ─── V1 Tools ─────────────────────────────────────────────────────────────
