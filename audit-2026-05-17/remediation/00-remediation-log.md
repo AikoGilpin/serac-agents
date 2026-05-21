@@ -38,10 +38,23 @@ For every remediation item, create or update `remediation/fixes/<id>-<short-name
 
 - Audit reports packaged permanently: yes.
 - Remediation started: yes.
-- Current remediation item: `P1-E SDK public package contract` — `retargeted on live checkout / verified / not deployed / not published`.
-- P1-C/D/E/F and P2-A/B/C/D/E/F/G/H/I/J/K have been retargeted/applied on the real live checkout and verified locally; remaining work is P3 polish or release/deploy/package planning for the accumulated remediation branch.
+- Current remediation item: `P3 Ed25519 challenge raw-vs-SPKI compatibility` — `fixed local / verified / not deployed`.
+- P1-C/D/E/F, P2-A/B/C/D/E/F/G/H/I/J/K, and P3 Ed25519 raw-key challenge compatibility have been retargeted/applied on the real live checkout and verified locally; remaining work is P3 polish or release/deploy/package planning for the accumulated remediation branch.
 
 ## Change history
+
+### 2026-05-21T13:53:53Z — P3 Ed25519 challenge raw/SPKI compatibility fixed locally, not deployed
+
+- Confirmed P3 source finding: agent registration stores Ed25519 public keys as raw 32-byte values, while the token challenge route attempted to create a DER/SPKI key directly from the stored bytes.
+- Added regression test `apps/api/src/__tests__/agent-ed25519.test.ts` covering raw 32-byte verification, SPKI DER verification, and malformed-key fail-closed behavior.
+- RED proof: focused Vitest failed before implementation because `../lib/agent-ed25519.js` did not exist.
+- Added `apps/api/src/lib/agent-ed25519.ts` with SPKI wrapping for raw keys using prefix `302a300506032b6570032100` and fail-closed verification semantics.
+- Patched `apps/api/src/routes/agent/auth.ts` so `POST /api/agent/auth/token` uses `verifyAgentEd25519Signature()` instead of inline SPKI-only `createPublicKey` logic.
+- GREEN proof: focused P3 Vitest passed (`3/3`), API `tsc --noEmit` passed, `git diff --cached --check` passed, `P3_ED25519_STATIC_SCAN_OK` passed.
+- Commit: `fef1ad14774ad70862ae0c7798ed9dad118e9a3a` (`fix(api): support raw Ed25519 agent keys`), pushed and remote SHA verified.
+- Caveat: a broader untracked `agent-auth.test.ts` in the dirty live checkout asserts unrelated public-registration/P0 behavior and was not used as P3 completion evidence; the final auth diff was restored to P3-only scope before commit.
+- No deploy, no image/container/service rebuild, no restart, no Caddy reload, no migration, no production DB/S3 operation.
+- Documentation fiche created: `remediation/fixes/p3-ed25519-challenge-raw-spki.md`.
 
 ### 2026-05-21T13:24:27Z — P1-E SDK public package contract verified on live branch, not published
 

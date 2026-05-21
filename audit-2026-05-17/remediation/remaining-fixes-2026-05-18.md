@@ -1,6 +1,6 @@
 # Serac.cloud Audit — Remaining Fixes Inventory
 
-- Updated UTC: 2026-05-21T13:24:27Z
+- Updated UTC: 2026-05-21T13:53:53Z
 - Source of truth:
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/99-final-synthesis.md`
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/remediation/00-remediation-log.md`
@@ -30,7 +30,8 @@
 ### Still requiring real remediation / integration
 
 - `P2-A` to `P2-K` — fixed local / verified / not deployed on remediation branch; live deploy verification remains pending.
-- `P3` polish items — open unless covered by a later explicit fix sheet.
+- `P3-008` — Ed25519 challenge raw-vs-SPKI compatibility: fixed local / verified / not deployed on remediation branch.
+- Remaining `P3` polish items — open unless covered by a later explicit fix sheet.
 
 ## P0 remaining work
 
@@ -227,7 +228,7 @@
 
 ## P3 remaining work
 
-- Ed25519 challenge raw-vs-SPKI compatibility: open.
+- Ed25519 challenge raw-vs-SPKI compatibility: fixed local / verified / not deployed on branch `remediation/p1f-p2a-p2d-20260520T010137Z`, commit `fef1ad14774ad70862ae0c7798ed9dad118e9a3a`.
 - SSE false Bearer without `Accept` may return `405` without OAuth challenge: open.
 - Dockerfiles lack `HEALTHCHECK` and digest pinning: open.
 - Deploy/rollback runbook not verified end-to-end: open.
@@ -239,7 +240,7 @@
 1. Decide release path for branch `remediation/p1f-p2a-p2d-20260520T010137Z`: PR/merge/tag/deploy or continue accumulating fixes.
 2. If deploying the accumulated branch: plan explicit live sequence: backup → rebuild → restart/recreate only approved services → verify health/metrics/API tests → run read-only storage audit → rollback plan.
 3. Decide SDK package release policy separately: no npm publish/reservation/deprecation without explicit approval.
-4. Continue P3 polish items, starting with the compatibility/security items that do not require deploy.
+4. Continue remaining P3 polish items, starting with the SSE/OAuth challenge behavior and Docker/runbook items that do not require deploy.
 5. Keep live verification/deployment debt visible; none of the branch-level fixes should be called production-closed before deploy/live checks.
 
 ## Important caveat
@@ -247,6 +248,6 @@
 The current state is safer than the initial audit, but **not production-closed**:
 
 - most fixes are local/branch-level;
-- no new deploy/rebuild/restart was performed during P2-K;
+- no new deploy/rebuild/restart was performed during P3 Ed25519;
 - `main` is not updated with the remediation branch;
 - `P1-E` is verified on the remediation branch but package publication/registry validation is still an explicit release decision.
