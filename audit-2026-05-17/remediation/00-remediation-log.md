@@ -38,10 +38,24 @@ For every remediation item, create or update `remediation/fixes/<id>-<short-name
 
 - Audit reports packaged permanently: yes.
 - Remediation started: yes.
-- Current remediation item: `P2-J base images/deps maintenance` — `open`.
-- P1-D/E/F and P2-A/B/C/D/E/F/G/H/I have been retargeted/applied on the real live checkout and verified locally; next queue remains base-image/dependency maintenance and storage/cleanup reconciliation.
+- Current remediation item: `P2-K storage/cleanup reconciliation` — `open`.
+- P1-D/E/F and P2-A/B/C/D/E/F/G/H/I/J have been retargeted/applied on the real live checkout and verified locally; next queue remains storage/cleanup reconciliation.
 
 ## Change history
+
+### 2026-05-21T12:29:09Z — P2-J supply-chain maintenance guardrail fixed locally, not deployed
+
+- Confirmed P2-J source finding: base/service images and dependency advisories needed an explicit maintenance cycle, not ad-hoc prod updates.
+- Added regression test `apps/api/src/__tests__/supply-chain-maintenance-contract.test.ts`.
+- RED proof: focused test failed before patch because `docs/security/dependency-maintenance.md` and `scripts/check-supply-chain-maintenance.mjs` did not exist.
+- Added `docs/security/dependency-maintenance.md` documenting monthly review cadence, no-production-install rule, isolated build host workflow, npm advisory handling, and base/service image scope.
+- Added `scripts/check-supply-chain-maintenance.mjs`, a no-network checker validating the policy file and API/Web Dockerfile assumptions (`node:20-alpine`, `RUN npm ci`, `USER node`, `tini`).
+- Compose/runtime files were intentionally not read for this item because they may contain credentials; PostgreSQL/Redis/Uptime/Plausible image references are documented from the audit baseline.
+- GREEN proof: focused P2-J Vitest passed (`2/2`), targeted P2/API non-regression passed (`18/18` across 5 files), no-network checker printed `SUPPLY_CHAIN_MAINTENANCE_CHECK_OK`, API `tsc --noEmit` passed.
+- Hygiene passed: `git diff --check`, `P2J_STATIC_SCAN_OK`.
+- Commit: `f24617129c2396d8082f5c022d9c783c9e566591` (`[security] document supply-chain maintenance`), pushed and remote SHA verified.
+- No dependency upgrade, no image pull/build, no deploy, no restart, no Caddy reload, no migration, no runtime config change.
+- Documentation fiche created: `remediation/fixes/p2-j-supply-chain-maintenance.md`.
 
 ### 2026-05-21T12:10:31Z — P2-I legacy human-facing feature boundary fixed locally, not deployed
 
