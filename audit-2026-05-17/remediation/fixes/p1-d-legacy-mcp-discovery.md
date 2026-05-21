@@ -144,4 +144,4 @@ Do not use broad `git restore .` in the dirty checkout; previous P0/P1 remediati
 
 ## Next step
 
-P1-D source-level remediation is verified on the live checkout but not deployed. Deployment/rebuild/restart still requires explicit Aiko approval. Continue with remaining `patch_ready_snapshot_only` item (`P1-E`), P3 polish, or release/deploy planning.
+P1-D source-level remediation is verified on the live checkout but not deployed. Deployment/rebuild/restart still requires explicit Aiko approval. Continue with P3 polish, release/deploy planning, or separate SDK package publication planning if Aiko approves it.

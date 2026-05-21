@@ -1,6 +1,6 @@
 # Serac.cloud Audit — Remaining Fixes Inventory
 
-- Updated UTC: 2026-05-21T13:20:11Z
+- Updated UTC: 2026-05-21T13:24:27Z
 - Source of truth:
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/99-final-synthesis.md`
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/remediation/00-remediation-log.md`
@@ -18,6 +18,7 @@
 - `P1-A/B` — API key scope + expiry: `fixed_local`; needs deploy/live verification.
 - `P1-C` — x402/payment gate fail-closed: `retargeted_on_live_checkout_verified_not_deployed`; needs deploy/live verification.
 - `P1-D` — legacy MCP discovery route: `retargeted_on_live_checkout_verified_not_deployed`; needs deploy/live verification.
+- `P1-E` — SDK public package contract: `retargeted_on_live_checkout_verified_not_deployed_not_published`; needs package-release decision.
 - `P1-F` — MCP/server-card output schemas: `retargeted_on_live_checkout_verified_not_deployed`; needs deploy/live verification.
 - `P1-G` — migration runner/checks: `fixed_local`; needs staging DB bootstrap/prod-safe migration verification.
 - `P1-H` — workspaces/local deps guard: `fixed_local`; needs clean install/audit in clean environment if desired.
@@ -28,7 +29,6 @@
 
 ### Still requiring real remediation / integration
 
-- `P1-E` — SDK public package contract: `patch_ready_snapshot_only`; must be retargeted to the real live checkout, SDK built/test-installed, and npm/package docs aligned.
 - `P2-A` to `P2-K` — fixed local / verified / not deployed on remediation branch; live deploy verification remains pending.
 - `P3` polish items — open unless covered by a later explicit fix sheet.
 
@@ -96,12 +96,11 @@
 
 ### P1-E — SDK package public contract
 
-- Current status: `patch_ready_snapshot_only`.
+- Current status: `retargeted_on_live_checkout_verified_not_deployed_not_published`.
 - Remaining:
-  - retarget SDK/package/docs changes to live checkout;
-  - decide canonical npm name permanently (`serac-agent-sdk` is the current patch choice);
-  - build SDK and run test install in a clean project;
-  - eventually publish/align npm if required by release plan.
+  - decide package release strategy (`serac-agent-sdk` publish/reserve/deprecate old names) before any npm action;
+  - clean-project install/import test from registry only if package publication/registry validation is explicitly approved;
+  - no deploy/rebuild/restart required for SDK package metadata itself unless bundled into a broader release.
 
 ### P1-F — MCP output schemas/server-card shapes
 
@@ -237,9 +236,9 @@
 
 ## Recommended next order
 
-1. Retarget and verify `P1-E` SDK public package contract on the real live checkout, or explicitly defer SDK/package release work.
-2. Decide release path for branch `remediation/p1f-p2a-p2d-20260520T010137Z`: PR/merge/tag/deploy or continue accumulating fixes on branch.
-3. If deploying the accumulated branch: plan explicit live sequence: backup → rebuild → restart/recreate only approved services → verify health/metrics/API tests → run read-only storage audit → rollback plan.
+1. Decide release path for branch `remediation/p1f-p2a-p2d-20260520T010137Z`: PR/merge/tag/deploy or continue accumulating fixes.
+2. If deploying the accumulated branch: plan explicit live sequence: backup → rebuild → restart/recreate only approved services → verify health/metrics/API tests → run read-only storage audit → rollback plan.
+3. Decide SDK package release policy separately: no npm publish/reservation/deprecation without explicit approval.
 4. Continue P3 polish items, starting with the compatibility/security items that do not require deploy.
 5. Keep live verification/deployment debt visible; none of the branch-level fixes should be called production-closed before deploy/live checks.
 
@@ -250,4 +249,4 @@ The current state is safer than the initial audit, but **not production-closed**
 - most fixes are local/branch-level;
 - no new deploy/rebuild/restart was performed during P2-K;
 - `main` is not updated with the remediation branch;
-- `P1-E` remains snapshot-only until retargeted/applied on the real checkout.
+- `P1-E` is verified on the remediation branch but package publication/registry validation is still an explicit release decision.

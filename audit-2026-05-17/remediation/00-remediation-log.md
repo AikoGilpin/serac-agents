@@ -38,10 +38,20 @@ For every remediation item, create or update `remediation/fixes/<id>-<short-name
 
 - Audit reports packaged permanently: yes.
 - Remediation started: yes.
-- Current remediation item: `P2-K storage/cleanup reconciliation` — `fixed local / verified / not deployed`.
-- P1-C/D/F and P2-A/B/C/D/E/F/G/H/I/J/K have been retargeted/applied on the real live checkout and verified locally; remaining pre-deploy work is `P1-E` SDK package contract, P3 polish, or release/deploy decision for the accumulated remediation branch.
+- Current remediation item: `P1-E SDK public package contract` — `retargeted on live checkout / verified / not deployed / not published`.
+- P1-C/D/E/F and P2-A/B/C/D/E/F/G/H/I/J/K have been retargeted/applied on the real live checkout and verified locally; remaining work is P3 polish or release/deploy/package planning for the accumulated remediation branch.
 
 ## Change history
+
+### 2026-05-21T13:24:27Z — P1-E SDK public package contract verified on live branch, not published
+
+- Confirmed P1-E source finding: SDK package/docs/client metadata had drifted between stale `@serac/sdk` / `serac.cloud` endpoint and canonical `serac-agent-sdk` / `api.serac.cloud` endpoint.
+- Verified live checkout layout uses `packages/sdk/`, not snapshot `sdk/`.
+- Confirmed P1-E changes are present on Serac remediation commit `0bb0128e4d4be28e57022c628789b3c073d0b6a8`, included in branch head `071aa214270274e82b601e630f16c2c0e149ffa0`.
+- GREEN proof: SDK package contract passed (`19/19`), SDK search tests passed (`5/5`), SDK `tsc --noEmit` passed, API `tsc --noEmit` passed, `npm pack --dry-run` produced 22 package files and left no `.tgz` artifact.
+- Remote verification: local branch head matched `origin/remediation/p1f-p2a-p2d-20260520T010137Z` at `071aa214270274e82b601e630f16c2c0e149ffa0`.
+- No deploy, no image/container/service rebuild, no restart, no Caddy reload, no migration, no npm publish/deprecate/reserve action.
+- Documentation fiche updated: `remediation/fixes/p1-e-sdk-package-contract.md`.
 
 ### 2026-05-21T13:00:31Z — P2-K storage/cleanup reconciliation fixed locally, not deployed
 
