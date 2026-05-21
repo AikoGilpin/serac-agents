@@ -38,10 +38,26 @@ For every remediation item, create or update `remediation/fixes/<id>-<short-name
 
 - Audit reports packaged permanently: yes.
 - Remediation started: yes.
-- Current remediation item: `P2-H Telegram alerting visibility + PII masking` — `pending_scope`.
-- P1-D/E/F and P2-A/B/C/D/E/F/G have been retargeted/applied on the real live checkout and verified locally; next queue remains P2 alerting/legacy/storage reconciliation.
+- Current remediation item: `P2-I legacy human-facing/dependency scope` — `pending_scope`.
+- P1-D/E/F and P2-A/B/C/D/E/F/G/H have been retargeted/applied on the real live checkout and verified locally; next queue remains legacy/storage/dependency reconciliation.
 
 ## Change history
+
+### 2026-05-21T11:49:13Z — P2-H Telegram alerting observability + PII masking fixed locally, not deployed
+
+- Confirmed P2-H/P2-023 source finding: `sendTelegramAlert()` silently skipped missing config/failures, and cleanup over-quota Telegram alert included the raw user email.
+- Added regression test `apps/api/src/__tests__/telegram-alerting-contract.test.ts`.
+- RED proof: focused test failed before patch (`4/4` failures) because structured results/metrics/redaction/call-site masking were absent.
+- Patched `apps/api/src/lib/telegram.ts` to return structured `sent`/`failed`/`skipped` results, update Telegram alert metrics, warn once on missing config without exposing token/chat values, and defensively redact emails before Telegram egress.
+- Patched `apps/api/src/lib/cleanup.ts` to use `maskEmail(user["email"] as string)` in the over-quota Telegram purge alert.
+- Updated `docs/observability/serac-api-metrics.md` with Telegram alert metric contract.
+- GREEN proof: focused P2-H Vitest passed (`4/4`), targeted P2/API non-regression passed (`13/13` across 3 files), API `tsc --noEmit` passed.
+- Hygiene passed: `git diff --cached --check`, `STATIC_SCAN_OK`, `TEMP_CONFIG_OK`.
+- Backup: `/tmp/serac-p2h-telegram-backup-20260521T1145Z`.
+- Caveat: `apps/api/src/routes/admin/infra.ts` remains untracked in the dirty live checkout and was not modified/staged for this fix.
+- Commit: `c6a9451873af5b8beb0ad6c65ed4fb638a04b77c` (`[security] add Telegram alert observability`), pushed and remote SHA verified.
+- No deploy, no image/container/service rebuild, no restart, no Caddy reload, no migration.
+- Documentation fiche created: `remediation/fixes/p2-h-telegram-alerting-pii.md`.
 
 ### 2026-05-21T11:26:26Z — P2-G cleanup distributed lock fixed locally, not deployed
 
