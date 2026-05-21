@@ -1,6 +1,6 @@
 # Serac.cloud Audit — Remaining Fixes Inventory
 
-- Updated UTC: 2026-05-21T11:49:13Z
+- Updated UTC: 2026-05-21T12:10:31Z
 - Source of truth:
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/99-final-synthesis.md`
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/remediation/00-remediation-log.md`
@@ -29,8 +29,8 @@
 - `P1-D` — legacy MCP discovery route: `patch_ready_snapshot_only`; must be retargeted to the real live checkout and verified.
 - `P1-E` — SDK public package contract: `patch_ready_snapshot_only`; must be retargeted to the real live checkout, SDK built/test-installed, and npm/package docs aligned.
 - `P1-F` — MCP/server-card output schemas: `patch_ready_snapshot_only`; must be retargeted to the real live checkout and verified against handler results.
-- `P2-A` to `P2-H` — fixed local / verified / not deployed on remediation branch; live deploy verification remains pending.
-- `P2-I` to `P2-K` — open unless covered by a later explicit fix sheet.
+- `P2-A` to `P2-I` — fixed local / verified / not deployed on remediation branch; live deploy verification remains pending.
+- `P2-J` to `P2-K` — open unless covered by a later explicit fix sheet.
 - `P3` polish items — open unless covered by a later explicit fix sheet.
 
 ## P0 remaining work
@@ -207,10 +207,10 @@
 - Status: fixed local / verified / not deployed.
 - Fix: Telegram alert helper now exposes configured/sent/skipped/failed metrics, returns structured best-effort results, warns once when config is absent without exposing token/chat values, defensively redacts emails before Telegram egress, and cleanup over-quota alert uses `maskEmail()`.
 
-### P2-I — Legacy human-facing/deps scope unclear
+### P2-I — Legacy human-facing/deps boundary
 
-- Status: open.
-- Fix: decide official pivot boundaries; feature-flag, remove, or maintain legacy modules intentionally.
+- Status: fixed local / verified / not deployed.
+- Fix: added `SERAC_ENABLE_LEGACY_HUMAN_FEATURES` as a non-breaking default-enabled feature flag; routed photos/albums/shared-albums/photo-embeddings/glacier/TOTP through one explicit registration helper; documented route/dependency scope and deferred dependency removal until the matching legacy modules are intentionally disabled or removed.
 
 ### P2-J — Base images/deps maintenance
 

@@ -38,10 +38,25 @@ For every remediation item, create or update `remediation/fixes/<id>-<short-name
 
 - Audit reports packaged permanently: yes.
 - Remediation started: yes.
-- Current remediation item: `P2-I legacy human-facing/dependency scope` — `pending_scope`.
-- P1-D/E/F and P2-A/B/C/D/E/F/G/H have been retargeted/applied on the real live checkout and verified locally; next queue remains legacy/storage/dependency reconciliation.
+- Current remediation item: `P2-J base images/deps maintenance` — `open`.
+- P1-D/E/F and P2-A/B/C/D/E/F/G/H/I have been retargeted/applied on the real live checkout and verified locally; next queue remains base-image/dependency maintenance and storage/cleanup reconciliation.
 
 ## Change history
+
+### 2026-05-21T12:10:31Z — P2-I legacy human-facing feature boundary fixed locally, not deployed
+
+- Confirmed P2-I source finding: the agent-first pivot had no explicit boundary for legacy human-facing routes/deps.
+- Added regression test `apps/api/src/__tests__/legacy-human-features-contract.test.ts`.
+- RED proof: focused test failed before patch because `../lib/legacy-human-features.js` did not exist and `index.ts` registered legacy routes directly.
+- Patched `apps/api/src/lib/legacy-human-features.ts` with `SERAC_ENABLE_LEGACY_HUMAN_FEATURES`, default-enabled non-breaking semantics, disabled values (`false`, `0`, `off`, `disabled`, `no`), and structured registration results.
+- Patched `apps/api/src/index.ts` so photos/albums/shared-albums/photo-embeddings/glacier/TOTP route plugins are registered only through `registerLegacyHumanRoutes()`.
+- Added `docs/security/legacy-human-features.md` documenting the pivot boundary, route scope, and dependency-removal sequence.
+- Dependency inventory: `nodemailer`, `otpauth`, `qrcode`, `heic2any`, `exifr`, TensorFlow/MobileNet, and HuggingFace Transformers are still referenced by active legacy/email/web code, so removal is deferred until those modules are disabled/removed intentionally.
+- GREEN proof: focused P2-I Vitest passed (`3/3`), targeted P2/API non-regression passed (`31/31` across 7 files), API `tsc --noEmit` passed.
+- Hygiene passed: `git diff --check`, `STATIC_SCAN_OK`, `TEMP_CONFIG_OK`.
+- Commit: `2fdb1480ab33787e9fab602f8d37373fd7abe974` (`[security] gate legacy human features`), pushed and remote SHA verified.
+- No deploy, no image/container/service rebuild, no restart, no Caddy reload, no migration, no runtime config change.
+- Documentation fiche created: `remediation/fixes/p2-i-legacy-human-feature-boundary.md`.
 
 ### 2026-05-21T11:49:13Z — P2-H Telegram alerting observability + PII masking fixed locally, not deployed
 
