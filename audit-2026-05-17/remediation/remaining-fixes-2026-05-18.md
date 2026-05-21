@@ -1,6 +1,6 @@
 # Serac.cloud Audit — Remaining Fixes Inventory
 
-- Updated UTC: 2026-05-21T12:29:09Z
+- Updated UTC: 2026-05-21T13:20:11Z
 - Source of truth:
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/99-final-synthesis.md`
   - `/home/hermes/projects/serac-agents/audit-2026-05-17/remediation/00-remediation-log.md`
@@ -16,6 +16,9 @@
 - `P0/P1-D` — presigned upload token generation/hash/TTL/one-time use: `fixed_local`; needs deploy/live verification.
 - `P0-C` — container secret-file support + compose secret pattern: `fixed_local`; still needs real secret creation/rotation/deploy.
 - `P1-A/B` — API key scope + expiry: `fixed_local`; needs deploy/live verification.
+- `P1-C` — x402/payment gate fail-closed: `retargeted_on_live_checkout_verified_not_deployed`; needs deploy/live verification.
+- `P1-D` — legacy MCP discovery route: `retargeted_on_live_checkout_verified_not_deployed`; needs deploy/live verification.
+- `P1-F` — MCP/server-card output schemas: `retargeted_on_live_checkout_verified_not_deployed`; needs deploy/live verification.
 - `P1-G` — migration runner/checks: `fixed_local`; needs staging DB bootstrap/prod-safe migration verification.
 - `P1-H` — workspaces/local deps guard: `fixed_local`; needs clean install/audit in clean environment if desired.
 - `P1-I` — npm lockfile critical/high reduced: `fixed_lockfile_local`; two moderate residuals remain due Next/PostCSS metadata.
@@ -25,12 +28,8 @@
 
 ### Still requiring real remediation / integration
 
-- `P1-C` — x402/payment gate fail-closed: `patch_ready_snapshot_only`; must be retargeted to the real live checkout and verified.
-- `P1-D` — legacy MCP discovery route: `patch_ready_snapshot_only`; must be retargeted to the real live checkout and verified.
 - `P1-E` — SDK public package contract: `patch_ready_snapshot_only`; must be retargeted to the real live checkout, SDK built/test-installed, and npm/package docs aligned.
-- `P1-F` — MCP/server-card output schemas: `patch_ready_snapshot_only`; must be retargeted to the real live checkout and verified against handler results.
-- `P2-A` to `P2-J` — fixed local / verified / not deployed on remediation branch; live deploy verification remains pending.
-- `P2-K` — open unless covered by a later explicit fix sheet.
+- `P2-A` to `P2-K` — fixed local / verified / not deployed on remediation branch; live deploy verification remains pending.
 - `P3` polish items — open unless covered by a later explicit fix sheet.
 
 ## P0 remaining work
@@ -81,21 +80,18 @@
 
 ### P1-C — x402/payment-gate fail-closed
 
-- Current status: `patch_ready_snapshot_only`.
+- Current status: `retargeted_on_live_checkout_verified_not_deployed`.
 - Remaining:
-  - retarget patch to `/home/sniper/serac` live layout;
-  - add/port tests into live `apps/api`;
-  - verify paid-tool pricing, missing vault/payment terms, unknown payment methods, missing wallet config all deny rather than allow;
-  - run API lint/typecheck and static scans;
-  - only then stage into remediation branch.
-- Recommended next active coding item.
+  - deploy/rebuild/restart only after Aiko GO;
+  - live/staging verification that paid-tool pricing, missing vault/payment terms, unknown payment methods, missing wallet config all deny rather than allow;
+  - production migration/status check for canonical tool-pricing rows only if explicitly approved.
 
 ### P1-D — Legacy MCP discovery route
 
-- Current status: `patch_ready_snapshot_only`.
+- Current status: `retargeted_on_live_checkout_verified_not_deployed`.
 - Remaining:
-  - retarget patch to live route module;
-  - ensure nested `/api/agent/.well-known/mcp.json` redirects/aliases canonically and cannot serve stale endpoint/crypto metadata;
+  - deploy/rebuild/restart only after Aiko GO;
+  - live verification that nested `/api/agent/.well-known/mcp.json` redirects/aliases canonically and cannot serve stale endpoint/crypto metadata;
   - verify public discovery + OAuth resource behavior still works.
 
 ### P1-E — SDK package public contract
@@ -109,11 +105,11 @@
 
 ### P1-F — MCP output schemas/server-card shapes
 
-- Current status: `patch_ready_snapshot_only`.
+- Current status: `retargeted_on_live_checkout_verified_not_deployed`.
 - Remaining:
-  - retarget schema changes to live checkout;
-  - verify every `outputSchema` matches real handler output;
-  - ideally deduplicate via single source of truth for tools/server-card/types.
+  - deploy/rebuild/restart only after Aiko GO;
+  - live/client verification that every `outputSchema` matches real handler output;
+  - ideally deduplicate further via single source of truth for tools/server-card/types.
 
 ### P1-G — Migrations runner
 
@@ -169,23 +165,27 @@
 
 ### P2-A — CORS global reflects origin with credentials
 
-- Status: open.
+- Status: fixed local / verified / not deployed.
 - Fix: split human CORS allowlist from agent/MCP CORS; avoid credentialed wildcard-reflection behavior.
+- Verification: focused P2-A Vitest `4/4`, API lint/typecheck, targeted P1-D/P1-F non-regression `10/10`, `STATIC_SCAN_OK`, `TEMP_CONFIG_OK`.
 
 ### P2-B — SDK default endpoint non-canonical
 
-- Status: partially addressed in P1-E snapshot patch, not verified live.
-- Fix: ensure `https://api.serac.cloud/api/agent/mcp/v1` everywhere in SDK code, docs, registry metadata, examples.
+- Status: fixed local / verified / not published.
+- Fix: canonical endpoint `https://api.serac.cloud/api/agent/mcp/v1` verified in SDK source, generated `dist`, docs, package contract, and package dry-run.
+- Verification: SDK contract `19/19`, SDK search tests `5/5`, `npm pack --dry-run` succeeded for `serac-agent-sdk@0.1.1`, `STALE_SCAN_OK`, `PACK_ARTIFACTS_OK`.
 
 ### P2-C — Archive/restore audit log probably loses namespace context
 
-- Status: open.
-- Fix: use real `namespace_id`, surface/archive audit errors instead of swallowing them silently.
+- Status: fixed local / verified / not deployed.
+- Fix: archive/restore audit logs now use real `namespace_id` and surface audit insert failures instead of swallowing them silently.
+- Verification: focused P2-C Vitest `5/5`, targeted API non-regression `20/20`, API lint/typecheck, `P2C_STATIC_SCAN_OK`, `TEMP_CONFIG_OK`.
 
 ### P2-D — Crypto SDK streaming buffers everything
 
-- Status: open.
-- Fix: implement true streaming with lookahead or document honestly as chunked-buffered encryption/decryption.
+- Status: fixed local / verified / not deployed.
+- Fix: `encryptStream()` now uses bounded one-chunk lookahead and comments document the real 5-byte AAD layout without changing the encrypted format.
+- Verification: focused P2-D regression, full `@serac/crypto` suite `51/51`, crypto lint/build, `P2D_STATIC_SCAN_OK`.
 
 ### P2-E — Healthcheck incomplete and API domain inconsistent
 
@@ -221,8 +221,10 @@
 
 ### P2-K — Storage/cleanup reconciliation incomplete
 
-- Status: open.
-- Fix: extend `audit-s3.ts` to `agent_objects` and shared albums; reconcile namespace/vault/object/storage counters; add TTL/soft-delete cleanup.
+- Status: fixed local / verified / not deployed.
+- Fix: extended `audit-s3.ts` to include `agent_objects` and shared album photo original/thumbnail/preview keys; added human shared-album usage drift checks; reconciles `agent_vaults` and `agent_namespaces` storage/object counters from live confirmed agent objects; added cleanup of pending, expired, and old soft-deleted agent objects.
+- Verification: focused P2-K Vitest `2/2`, targeted P2 combined non-regression `14/14`, API `tsc --noEmit`, `git diff --check`, `P2K_STATIC_SCAN_OK`.
+- Limitation: no deploy/rebuild/restart/migration and no live DB/S3 audit execution; production effects remain pending release/deploy approval.
 
 ## P3 remaining work
 
@@ -235,17 +237,17 @@
 
 ## Recommended next order
 
-1. Retarget and verify `P1-C` on live checkout.
-2. Retarget and verify `P1-D/E/F` on live checkout.
-3. Decide release path for branch `remediation/p0-p1-audit-2026-05-18`: PR/merge/tag/deploy or continue accumulating fixes on branch.
-4. If deploying P0/P1: plan explicit live sequence: backup → rebuild → recreate containers if secrets involved → verify endpoints/tests → rollback plan.
-5. Continue P2-K storage/cleanup reconciliation, or pause and decide whether to merge/deploy the accumulated remediation branch before adding more fixes.
+1. Retarget and verify `P1-E` SDK public package contract on the real live checkout, or explicitly defer SDK/package release work.
+2. Decide release path for branch `remediation/p1f-p2a-p2d-20260520T010137Z`: PR/merge/tag/deploy or continue accumulating fixes on branch.
+3. If deploying the accumulated branch: plan explicit live sequence: backup → rebuild → restart/recreate only approved services → verify health/metrics/API tests → run read-only storage audit → rollback plan.
+4. Continue P3 polish items, starting with the compatibility/security items that do not require deploy.
+5. Keep live verification/deployment debt visible; none of the branch-level fixes should be called production-closed before deploy/live checks.
 
 ## Important caveat
 
 The current state is safer than the initial audit, but **not production-closed**:
 
 - most fixes are local/branch-level;
-- no new deploy/rebuild/restart was performed during P1-K/P1-L;
+- no new deploy/rebuild/restart was performed during P2-K;
 - `main` is not updated with the remediation branch;
-- snapshot-only P1-C/D/E/F still require real-checkout integration.
+- `P1-E` remains snapshot-only until retargeted/applied on the real checkout.

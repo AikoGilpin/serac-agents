@@ -38,10 +38,23 @@ For every remediation item, create or update `remediation/fixes/<id>-<short-name
 
 - Audit reports packaged permanently: yes.
 - Remediation started: yes.
-- Current remediation item: `P2-K storage/cleanup reconciliation` — `open`.
-- P1-D/E/F and P2-A/B/C/D/E/F/G/H/I/J have been retargeted/applied on the real live checkout and verified locally; next queue remains storage/cleanup reconciliation.
+- Current remediation item: `P2-K storage/cleanup reconciliation` — `fixed local / verified / not deployed`.
+- P1-C/D/F and P2-A/B/C/D/E/F/G/H/I/J/K have been retargeted/applied on the real live checkout and verified locally; remaining pre-deploy work is `P1-E` SDK package contract, P3 polish, or release/deploy decision for the accumulated remediation branch.
 
 ## Change history
+
+### 2026-05-21T13:00:31Z — P2-K storage/cleanup reconciliation fixed locally, not deployed
+
+- Confirmed P2-K source finding: `audit-s3.ts` covered human files/photo variants but omitted `agent_objects` and shared album photo variants; cleanup had no verified agent object lifecycle purge.
+- Added regression test `apps/api/src/__tests__/storage-cleanup-reconciliation-contract.test.ts`.
+- RED proof: focused test failed before patch because `audit-s3.ts` did not reference `agent_objects`, `shared_album_photos`, agent vault/namespace counter checks, and `cleanup.ts` did not include `cleanupAgentObjects()`.
+- Patched `apps/api/src/scripts/audit-s3.ts` to include agent object S3 keys, shared album original/thumbnail/preview keys, shared-album human usage, agent pending/expired/soft-deleted lifecycle reporting, and agent vault/namespace storage/object counter drift checks.
+- Patched `apps/api/src/lib/cleanup.ts` to purge old pending agent uploads, expired confirmed agent objects with vault/namespace counter decrements, and old soft-deleted agent objects without double-decrementing counters.
+- GREEN proof: focused P2-K Vitest passed (`2/2`), targeted P2 combined non-regression passed (`14/14` across 5 files), API `tsc --noEmit` passed.
+- Hygiene passed: `git diff --check`, `P2K_STATIC_SCAN_OK`.
+- Commit: `071aa214270274e82b601e630f16c2c0e149ffa0` (`[security] reconcile storage cleanup`), pushed and remote SHA verified.
+- No deploy, no image/container/service rebuild, no restart, no Caddy reload, no migration, no production DB/S3 audit execution.
+- Documentation fiche created: `remediation/fixes/p2-k-storage-cleanup-reconciliation.md`.
 
 ### 2026-05-21T12:29:09Z — P2-J supply-chain maintenance guardrail fixed locally, not deployed
 
